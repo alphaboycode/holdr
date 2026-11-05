@@ -103,12 +103,29 @@ export const DealCard: React.FC<DealCardProps> = ({
       <h4 className="deal-card-title">{deal.title}</h4>
 
       <div className="deal-card-meta">
-        <div className="meta-item">
-          <span className="meta-label">{counterpartyLabel}:</span>
-          <span className="meta-value font-mono" title={counterpartyAddress}>
-            {shortenAddress(counterpartyAddress)}
-          </span>
-        </div>
+        {!isBuyer && !isSeller && !isArbiter ? (
+          <>
+            <div className="meta-item">
+              <span className="meta-label">Buyer:</span>
+              <span className="meta-value font-mono" title={deal.buyer}>
+                {shortenAddress(deal.buyer)}
+              </span>
+            </div>
+            <div className="meta-item">
+              <span className="meta-label">Seller:</span>
+              <span className="meta-value font-mono" title={deal.seller}>
+                {shortenAddress(deal.seller)}
+              </span>
+            </div>
+          </>
+        ) : (
+          <div className="meta-item">
+            <span className="meta-label">{counterpartyLabel}:</span>
+            <span className="meta-value font-mono" title={counterpartyAddress}>
+              {shortenAddress(counterpartyAddress)}
+            </span>
+          </div>
+        )}
 
         {nextDeadlineLabel && (
           <div className="meta-item">

@@ -25,7 +25,7 @@ import './App.css';
 export const App: React.FC = () => {
   // Navigation & routing
   const [selectedDealId, setSelectedDealId] = useState<bigint | null>(null);
-  const [activeTab, setActiveTab] = useState<DashboardTab>('buyer');
+  const [activeTab, setActiveTab] = useState<DashboardTab>('all');
   const [isCreatingDeal, setIsCreatingDeal] = useState(false);
   const [lookupIdInput, setLookupIdInput] = useState('');
 
@@ -284,9 +284,29 @@ export const App: React.FC = () => {
     return () => clearInterval(interval);
   }, [fetchData]);
 
+  // Counts for role tabs
+  const buyerDealsCount = useMemo(() => {
+    if (!account) return 0;
+    const addr = account.toLowerCase();
+    return deals.filter((d) => d.buyer.toLowerCase() === addr).length;
+  }, [deals, account]);
+
+  const sellerDealsCount = useMemo(() => {
+    if (!account) return 0;
+    const addr = account.toLowerCase();
+    return deals.filter((d) => d.seller.toLowerCase() === addr).length;
+  }, [deals, account]);
+
+  const arbiterDealsCount = useMemo(() => {
+    if (!account) return 0;
+    const addr = account.toLowerCase();
+    return deals.filter((d) => d.arbiter.toLowerCase() === addr).length;
+  }, [deals, account]);
+
   // Filter deals based on active dashboard tab
   const filteredDeals = useMemo(() => {
-    if (!account) return deals;
+    if (activeTab === 'all') return deals;
+    if (!account) return [];
     const addr = account.toLowerCase();
 
     if (activeTab === 'buyer') {
@@ -624,22 +644,28 @@ export const App: React.FC = () => {
                 <div className="dashboard-controls-bar">
                   <div className="tab-group">
                     <button
+                      className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`}
+                      onClick={() => setActiveTab('all')}
+                    >
+                      🌐 All Deals ({deals.length})
+                    </button>
+                    <button
                       className={`tab-btn ${activeTab === 'buyer' ? 'active' : ''}`}
                       onClick={() => setActiveTab('buyer')}
                     >
-                      👤 As Buyer
+                      👤 As Buyer {account ? `(${buyerDealsCount})` : ''}
                     </button>
                     <button
                       className={`tab-btn ${activeTab === 'seller' ? 'active' : ''}`}
                       onClick={() => setActiveTab('seller')}
                     >
-                      💼 As Seller
+                      💼 As Seller {account ? `(${sellerDealsCount})` : ''}
                     </button>
                     <button
                       className={`tab-btn ${activeTab === 'arbiter' ? 'active' : ''}`}
                       onClick={() => setActiveTab('arbiter')}
                     >
-                      ⚖️ As Arbiter
+                      ⚖️ As Arbiter {account ? `(${arbiterDealsCount})` : ''}
                     </button>
                   </div>
 
@@ -672,26 +698,56 @@ export const App: React.FC = () => {
                   </div>
                 ) : filteredDeals.length === 0 ? (
                   <div className="state-card empty-state">
-                    <span className="empty-icon">🤝</span>
-                    <h3>No Escrow Deals Found</h3>
+                    <span className="empty-icon">{!account && activeTab !== 'all' ? '🔌' : '🤝'}</span>
+                    <h3>
+                      {!account && activeTab !== 'all'
+                        ? 'Wallet Not Connected'
+                        : 'No Escrow Deals Found'}
+                    </h3>
                     <p>
-                      {!account
-                        ? 'Connect your wallet to see deals where you are buyer, seller, or arbiter.'
+                      {!account && activeTab !== 'all'
+                        ? `Connect your wallet to filter deals where you are ${
+                            activeTab === 'buyer'
+                              ? 'the buyer'
+                              : activeTab === 'seller'
+                              ? 'the seller'
+                              : 'the arbiter'
+                          }, or browse all public deals on BOT Testnet.`
+                        : activeTab === 'all'
+                        ? 'No escrow deals have been created on BOT Testnet yet.'
                         : activeTab === 'buyer'
                         ? "You haven't created any deals as buyer yet."
                         : activeTab === 'seller'
                         ? 'No active deals assigned to your seller address.'
                         : 'No disputes currently assigned to your arbiter address.'}
                     </p>
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => {
-                        if (!account) connectWallet();
-                        else setIsCreatingDeal(true);
-                      }}
-                    >
-                      Create First Deal
-                    </button>
+                    <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', marginTop: '1rem', flexWrap: 'wrap' }}>
+                      {!account ? (
+                        <>
+                          <button className="btn btn-primary" onClick={connectWallet}>
+                            Connect Wallet
+                          </button>
+                          {activeTab !== 'all' && (
+                            <button className="btn btn-outline" onClick={() => setActiveTab('all')}>
+                              View All Deals ({deals.length})
+                            </button>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          {activeTab === 'buyer' && (
+                            <button className="btn btn-primary" onClick={() => setIsCreatingDeal(true)}>
+                              + Create New Deal
+                            </button>
+                          )}
+                          {activeTab !== 'all' && (
+                            <button className="btn btn-outline" onClick={() => setActiveTab('all')}>
+                              View All Deals ({deals.length})
+                            </button>
+                          )}
+                        </>
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <div className="deals-grid">

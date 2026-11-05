@@ -28,7 +28,7 @@ export interface Deal {
 
 export type UserRole = 'buyer' | 'seller' | 'arbiter' | 'stranger';
 
-export type DashboardTab = 'buyer' | 'seller' | 'arbiter';
+export type DashboardTab = 'all' | 'buyer' | 'seller' | 'arbiter';
 
 export interface TxStatus {
   state: 'idle' | 'pending' | 'success' | 'error';
