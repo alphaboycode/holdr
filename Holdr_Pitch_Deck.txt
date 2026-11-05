@@ -1,0 +1,273 @@
+================================================================================
+                                  HOLDR
+            Trust-Minimized Onchain Escrow for Freelance Payments
+                              on the BOT Network
+================================================================================
+
+PITCH DECK | NOVEMBER 2026
+
+--------------------------------------------------------------------------------
+SLIDE 1: COVER & EXECUTIVE SUMMARY
+--------------------------------------------------------------------------------
+Project Name : Holdr
+Network      : BOT Testnet (Chain ID: 968)
+RPC Endpoint : https://rpc.bohr.life
+Block Explorer: https://scan.bohr.life
+Native Token : BOT (18 Decimals)
+Contract     : 0x012A03aC38bdffa9cBA9d8D4BAc7861aCEf0052b
+Explorer URL : https://scan.bohr.life/address/0x012A03aC38bdffa9cBA9d8D4BAc7861aCEf0052b
+Tagline      : Trust-Minimized Onchain Escrow for Freelance Payments & Gig Economy
+
+EXECUTIVE SUMMARY:
+Holdr is a decentralized, trust-minimized escrow application engineered natively for
+the BOT blockchain. Built with pure Solidity (^0.8.24) and OpenZeppelin 5.x security
+primitives, Holdr guarantees that neither freelancers nor clients can be trapped,
+cheated, or held hostage by centralized platforms.
+
+A buyer creates a milestone deal, locks native BOT into the contract, and names a
+trusted third-party arbiter agreed upon with the seller. The seller delivers work,
+initiating a verifiable review window. If approved, funds release immediately. If
+disputed, the chosen arbiter inspects evidence onchain and allocates funds. Built-in
+game-theoretic timeouts (overdue refunds, silent buyer claims, and a 14-day arbiter
+fallback split) ensure funds can never be frozen indefinitely.
+
+All deal metadata (titles, descriptions, delivery notes, and dispute claims) is
+stored 100% onchain as plain UTF-8 strings. No IPFS, no backend servers, no fees.
+
+--------------------------------------------------------------------------------
+SLIDE 2: THE PROBLEM IN FREELANCE PAYMENTS
+--------------------------------------------------------------------------------
+The global freelance and gig economy processes over $1.5 Trillion annually, yet
+relies on extractive, fragile Web2 platforms plagued by structural failures:
+
+1. Extractive Take Rates (10% - 20%):
+   - Platforms like Upwork, Fiverr, and Freelancer extract up to 20% from service
+     providers, reducing real take-home pay and penalizing repeat business.
+
+2. Unilateral Payment Holds & Chargebacks:
+   - Centralized payment rails (PayPal, Stripe) allow arbitrary 180-day fund holds
+     and chargeback fraud, leaving contractors unpaid after work has been delivered.
+
+3. Black-Box Dispute Settlement:
+   - When conflicts arise, outsourced platform support agents make opaque rulings
+     with zero cryptographic auditability, routinely siding with big spenders over
+     freelancers.
+
+4. Web3 Escrow Over-Engineering:
+   - Existing Web3 escrows depend on offchain oracle networks, complex multi-token
+     staking, external IPFS pinning gateways that break, or admin-governed DAO votes
+     that take weeks to settle.
+
+--------------------------------------------------------------------------------
+SLIDE 3: THE SOLUTION — HOLDR
+--------------------------------------------------------------------------------
+Holdr introduces a lightweight, permissionless, and immutable escrow primitive:
+
+- 0% Protocol Fees:
+  Holdr charges zero protocol tax. 100% of escrowed funds flow directly from buyer
+  to seller. No platform rent extraction.
+
+- 100% Fully Onchain Metadata:
+  All project specifications, delivery notes, and dispute reasons are stored
+  directly in smart contract storage. Zero external cloud or IPFS points of failure.
+
+- Strict Pull-Based Settlement (`pendingBalance` + `withdraw`):
+  Funds never leave the contract via push transfers. Instead, state transitions
+  credit user balances, which are pulled via `withdraw()`. An uncooperative or
+  reverting counterparty can never block or grief any transaction.
+
+- Guaranteed Dual-Sided Timeout Protections:
+  * Overdue Delivery Refund: If seller fails to deliver before the deadline,
+    the buyer can immediately claim a full refund.
+  * Silent Buyer Auto-Claim: If the buyer stays silent after delivery, the seller
+    claims the full payment as soon as the review window expires.
+  * Inactive Arbiter 50/50 Split: If an arbiter fails to rule within 14 days of a
+    dispute, either party can execute an automatic 50/50 settlement.
+
+- No Admin Powers, No Upgradeability:
+  No contract owner, no pausable state, no fee switch, and no proxy backdoors.
+  Only the designated deal participants and arbiter can ever interact with escrow funds.
+
+--------------------------------------------------------------------------------
+SLIDE 4: SMART CONTRACT ARCHITECTURE & SECURITY
+--------------------------------------------------------------------------------
+Core Protocol Design (`Holdr.sol`):
+
+        [ BUYER ]                                   [ SELLER ]
+           |                                            |
+    createDeal() {msg.value}                   markDelivered(note)
+    deliveryDeadline = now + deliveryDays       reviewEnd = now + reviewDays
+           |                                            |
+           v                                            v
+     +-----------+       Delivered               +-------------+
+     |  FUNDED   | ----------------------------> |  DELIVERED  |
+     +-----------+                               +-------------+
+       |       |                                   |     |     |
+       |       | release()                         |     |     | claimAfterReview()
+       |       v                                   |     |     v (if review expired)
+       |   +-----------+ <-------------------------+     |   +-----------+
+       |   | COMPLETED |      release()                  |   | COMPLETED |
+       |   +-----------+                                 |   +-----------+
+       |                                                 |
+       | refundOverdue() (if deadline passed)            | openDispute()
+       v                                                 v
+     +-----------+                               +-------------+
+     | REFUNDED  |                               |  DISPUTED   |
+     +-----------+                               +-------------+
+                                                   |         |
+                          resolve(sellerAmount)    |         | splitAfterArbiterTimeout()
+                          (Arbiter only)           |         | (if 14 days passed)
+                                                   v         v
+                                             +--------------------+
+                                             |      RESOLVED      |
+                                             +--------------------+
+
+Pull-Payment Payout Vault:
+- Every payout credits `pendingBalance[user] += amount`.
+- Funds leave strictly via `withdraw()` with OpenZeppelin `ReentrancyGuard`.
+- Strict Checks-Effects-Interactions (CEI) ensures complete reentrancy immunity.
+
+Verification & Testing Rigor:
+- Framework: Foundry (Solidity ^0.8.24) with optimizer enabled (200 runs).
+- 49 Total Tests Passed (0 failed, 0 skipped):
+  * 48 Unit & Fuzz Tests: Covering zero value, duplicate roles, boundary conditions,
+    time-travel via vm.warp, reentrancy attacks, and malicious rejector contracts.
+  * 1 Invariant Test: 256 fuzz runs, 128,000 handler calls across 7 action handlers,
+    mathematically proving that `holdr.balance == activeDealsSum + totalPendingBalance`.
+
+--------------------------------------------------------------------------------
+SLIDE 5: LIVE TRACTION & TESTNET DEPLOYMENT
+--------------------------------------------------------------------------------
+Holdr is deployed, live, and verified on the BOT Testnet (Chain ID 968):
+
+DEPLOYMENT DIRECTORY:
+- Contract Address : 0x012A03aC38bdffa9cBA9d8D4BAc7861aCEf0052b
+- Explorer Link    : https://scan.bohr.life/address/0x012a03ac38bdffa9cba9d8d4bac7861acef0052b
+- Verification     : Blockscout Verified (GUID: 012a03ac38bdffa9cba9d8d4bac7861acef0052b6aecf667)
+- Compiler Version : Solc 0.8.24 with optimizer (200 runs)
+- Gas Used Deploy  : 2,732,234 gas
+
+ONCHAIN CAPABILITIES & VERIFIED TRACTION:
+- 6 live escrow deals created, delivered, arbitrated, and released onchain.
+- 24 consecutive transactions executed and confirmed across 3 test wallets (8 txs each).
+- Complete lifecycle coverage: deal funding, delivery, buyer release, dispute arbitration,
+  voluntary seller refund, and pull-based `withdraw()` payouts.
+- Deals indexed per-user via `getUserDealIds(user, offset, limit)` newest first.
+- Dynamic global lookup via `getDeal(id)` and `getDeals(offset, limit)`.
+- Pull balances accessible via `pendingBalance(user)` and one-click `withdraw()`.
+
+--------------------------------------------------------------------------------
+SLIDE 6: PRODUCT EXPERIENCE & FRONTEND
+--------------------------------------------------------------------------------
+High-performance single-page application built with modern Web3 standards:
+- Tech Stack: Vite + React 18 + TypeScript + viem (zero heavy UI dependencies).
+- Theme: Trustworthy dark fintech aesthetic with calm teal/cyan accents, generous
+  spacing, and clean monospace typography for cryptographic addresses.
+- Role-Aware Dynamic Dashboard:
+  * "As Buyer", "As Seller", and "As Arbiter" filtered deal views.
+  * Pulsating "Action Needed" indicator when user intervention is required.
+  * Next deadline countdown timers (delivery deadline, review end, arbiter timeout).
+- Comprehensive Deal Detail Interface:
+  * Interactive Milestone Stepper: Visualizing deal progression through milestones.
+  * Plain-Text Security: Strict string escaping to eliminate XSS risks.
+  * Role-Gated Action Panel: Only displays valid actions permitted by the contract.
+  * Arbiter Settlement Tool: Visual slider & live split preview for dispute rulings.
+- Deep Linking & Sharing:
+  * Client-side hash routing (`#/deal/:id`) for sharing deal links.
+  * Direct ID lookup box in header navigation.
+- Real-Time Reliability:
+  * Automatic polling every 5 seconds.
+  * Instant state refresh upon transaction receipt.
+  * User-friendly error translation for all custom Solidity revert errors.
+
+--------------------------------------------------------------------------------
+SLIDE 7: GAME-THEORETIC DISPUTE SAFEGUARDS
+--------------------------------------------------------------------------------
+Holdr balances incentives between all three parties to achieve fair equilibrium:
+
+1. Prevention of Frivolous Disputes:
+   - Disputes can only be opened during the active review window (1–14 days) by
+     either buyer or seller with a detailed onchain reason (1–500 bytes).
+
+2. Neutral Arbiter Empowerment:
+   - The arbiter is selected mutually before funding. The arbiter has fine-grained
+     discretion to allocate from 0 to 100% of the deal amount to the seller, with
+     the remainder automatically refunding the buyer.
+
+3. Absent Arbiter Defense:
+   - If an arbiter fails to respond, neither party is held hostage. After the
+     14-day `ARBITER_TIMEOUT`, either party can trigger an automated 50/50 split
+     (with any odd wei credited to the buyer).
+
+4. Reentrancy & Denial-of-Service Immunity:
+   - Pull-based architecture isolates each user's payout. If a malicious contract
+     reverts upon receiving BOT, only its own withdrawal fails; other parties and
+     unrelated deals continue processing without interruption.
+
+--------------------------------------------------------------------------------
+SLIDE 8: MARKET OPPORTUNITY & ECOSYSTEM IMPACT
+--------------------------------------------------------------------------------
+Why Holdr is a Core Pillar for the BOT Network Economy:
+
+1. Native Escrow Infrastructure:
+   - Every growing ecosystem requires a native, trustless payment rail for freelance
+     developers, designers, auditors, community managers, and bounty hunters.
+
+2. Catalyst for Autonomous AI Agent Gigs:
+   - As AI agents on the BOT Network hire humans or other agents for tasks
+     (data collection, code generation, verification), Holdr provides an immutable,
+     programmatic escrow layer with timeout guarantees.
+
+3. Drives Native BOT Velocity:
+   - Escrow lockups create organic utility, locking circulating BOT in contracts
+     during milestone execution and driving transaction volume through state updates.
+
+4. Trustless B2B Collaboration:
+   - Enables pseudonymous teams to collaborate across borders with complete
+     counterparty risk mitigation and zero KYC or platform onboarding hurdles.
+
+--------------------------------------------------------------------------------
+SLIDE 9: STRATEGIC ROADMAP
+--------------------------------------------------------------------------------
+PHASE 1 (Q4 2026) - CORE PROTOCOL & TESTNET LAUNCH [COMPLETED]
+[x] Solidity 0.8.24 Holdr contract with OpenZeppelin 5.x ReentrancyGuard
+[x] 49-test Foundry test suite (unit tests, fuzzing, and 128k-call invariant test)
+[x] Broadcasted deployment & verification on BOT Testnet (Chain ID 968)
+[x] Vite + React + TypeScript + viem frontend with hash routing and dark fintech UI
+[x] Integration of official Holdr brand identity and logo
+
+PHASE 2 (Q1 2027) - MULTI-MILESTONE & REPUTATION EXPANSION
+[ ] Multi-milestone deals (sequential escrow releases per contract)
+[ ] Arbiter reputation scores & dispute history indexer
+[ ] Optional arbiter commission fee (e.g. 1-2% split upon successful ruling)
+[ ] Notification hooks (email/Telegram webhooks for milestone alerts)
+
+PHASE 3 (Q2 2027) - ECOSYSTEM SCALING & SDK
+[ ] Holdr Developer SDK for embedding escrow checkouts into Web3 marketplaces
+[ ] BOT Mainnet deployment and ecosystem grant integrations
+[ ] Multi-token escrow support (native BOT + ecosystem tokens)
+[ ] DAO arbitration pools for decentralized multi-signature dispute resolution
+
+--------------------------------------------------------------------------------
+SLIDE 10: DIRECTORY & ACCESS DETAILS
+--------------------------------------------------------------------------------
+Network Configuration:
+- Chain Name       : BOT Testnet
+- Chain ID         : 968
+- RPC Endpoint     : https://rpc.bohr.life
+- Native Token     : BOT (18 Decimals)
+- Block Explorer   : https://scan.bohr.life
+
+Protocol Addresses:
+- Holdr Escrow     : 0x012A03aC38bdffa9cBA9d8D4BAc7861aCEf0052b
+- Explorer View    : https://scan.bohr.life/address/0x012a03ac38bdffa9cba9d8d4bac7861acef0052b
+
+Project Repository:
+- Smart Contract   : contracts/src/Holdr.sol
+- Test Suites      : contracts/test/Holdr.t.sol & contracts/test/HoldrInvariant.t.sol
+- Deploy Script    : contracts/script/Deploy.s.sol
+- Frontend DApp    : frontend/src/App.tsx
+- Local Dev Server : http://localhost:5173/
+
+Holdr — Trust-Minimized Freelance Escrow on the BOT Network.
+================================================================================

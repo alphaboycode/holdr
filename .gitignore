@@ -1,0 +1,19 @@
+# Node / Frontend
+node_modules/
+dist/
+dist-ssr/
+*.local
+.env
+.env.*
+!.env.example
+
+# Foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+
+# Logs & temp
+*.log
+.DS_Store
+.password*
+*password*
