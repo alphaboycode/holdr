@@ -5,11 +5,11 @@ import fs from 'fs';
 // Load ABI & Address
 const holdrAbi = JSON.parse(fs.readFileSync('./src/contracts/Holdr.json', 'utf8'));
 const addressData = JSON.parse(fs.readFileSync('./src/contracts/address.json', 'utf8'));
-const holdrAddress = addressData['968'];
+const holdrAddress = addressData['677'] || addressData['968'];
 
-const botTestnet = defineChain({
-  id: 968,
-  name: 'BOT Testnet',
+const botMainnet = defineChain({
+  id: 677,
+  name: 'BOT Chain Mainnet',
   nativeCurrency: {
     decimals: 18,
     name: 'BOT',
@@ -17,13 +17,13 @@ const botTestnet = defineChain({
   },
   rpcUrls: {
     default: {
-      http: ['https://rpc.bohr.life'],
+      http: ['https://rpc.botchain.ai'],
     },
   },
   blockExplorers: {
     default: {
-      name: 'BohrScan',
-      url: 'https://scan.bohr.life',
+      name: 'BOTScan',
+      url: 'https://scan.botchain.ai',
     },
   },
 });
@@ -45,15 +45,15 @@ const w2Account = privateKeyToAccount(env.WALLET_2_PRIVATE_KEY);
 const w3Account = privateKeyToAccount(env.WALLET_3_PRIVATE_KEY);
 
 const publicClient = createPublicClient({
-  chain: botTestnet,
-  transport: http('https://rpc.bohr.life'),
+  chain: botMainnet,
+  transport: http('https://rpc.botchain.ai'),
 });
 
 function getWalletClient(account) {
   return createWalletClient({
     account,
-    chain: botTestnet,
-    transport: http('https://rpc.bohr.life'),
+    chain: botMainnet,
+    transport: http('https://rpc.botchain.ai'),
   });
 }
 
@@ -61,7 +61,7 @@ const w1Client = getWalletClient(w1Account);
 const w2Client = getWalletClient(w2Account);
 const w3Client = getWalletClient(w3Account);
 
-console.log('=== Executing 24 Transactions on BOT Testnet for Holdr ===');
+console.log('=== Executing 24 Transactions on BOT Chain Mainnet for Holdr ===');
 console.log(`Holdr Address: ${holdrAddress}`);
 console.log(`Wallet 1: ${w1Account.address}`);
 console.log(`Wallet 2: ${w2Account.address}`);
@@ -69,8 +69,8 @@ console.log(`Wallet 3: ${w3Account.address}\n`);
 
 const summary = {
   contract: holdrAddress,
-  chainId: 968,
-  network: 'BOT Testnet',
+  chainId: 677,
+  network: 'BOT Chain Mainnet',
   wallets: {
     wallet1: { address: w1Account.address, txs: [] },
     wallet2: { address: w2Account.address, txs: [] },
@@ -99,7 +99,7 @@ async function runTx(walletNum, client, account, description, writeCall) {
         hash,
         blockNumber: Number(receipt.blockNumber),
         gasUsed: Number(receipt.gasUsed),
-        explorerUrl: `https://scan.bohr.life/tx/${hash}`,
+        explorerUrl: `https://scan.botchain.ai/tx/${hash}`,
       };
 
       summary.wallets[`wallet${walletNum}`].txs.push(txRecord);

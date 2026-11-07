@@ -1317,35 +1317,289 @@ label {
 }
 
 /* ==========================================
-   Footer
+/* ==========================================
+   Footer & Ecosystem
    ========================================== */
 
 .app-footer {
   margin-top: auto;
   background-color: var(--bg-secondary);
   border-top: 1px solid var(--border-subtle);
-  padding: 1.5rem 2rem;
-  font-size: 0.85rem;
+  padding: 3rem 1.5rem 2rem;
+  font-size: 0.875rem;
   color: var(--text-dim);
 }
 
-.footer-content {
-  max-width: 1140px;
+.footer-container {
+  max-width: 780px;
   margin: 0 auto;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 2.25rem;
+  width: 100%;
 }
 
-.footer-link {
+/* Section 1: Proof on bot mainnet */
+.footer-proof-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem 2rem;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
+}
+
+.footer-proof-section:hover {
+  border-color: rgba(20, 184, 166, 0.4);
+  box-shadow: 0 8px 28px rgba(20, 184, 166, 0.12);
+}
+
+.proof-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+}
+
+.proof-badge-dot {
+  color: #10b981;
+  font-size: 0.85rem;
+  line-height: 1;
+  text-shadow: 0 0 8px rgba(16, 185, 129, 0.7);
+}
+
+.proof-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-main);
+}
+
+.proof-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.proof-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.proof-label {
+  color: var(--accent-cyan);
+  font-weight: 600;
+  min-width: 170px;
+}
+
+.proof-value {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.proof-link {
   color: var(--accent-teal);
+  transition: all 0.2s ease;
+  word-break: break-all;
   text-decoration: none;
 }
 
-.footer-link:hover {
+.proof-link:hover {
+  color: var(--accent-cyan);
   text-decoration: underline;
+}
+
+.proof-link.mono {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+/* Section 2: Part of the Ecosystem */
+.ecosystem-section {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.ecosystem-card {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 2.25rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
+}
+
+.ecosystem-card:hover {
+  border-color: rgba(20, 184, 166, 0.4);
+  box-shadow: 0 12px 36px rgba(20, 184, 166, 0.12);
+}
+
+.ecosystem-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-teal);
+  margin-bottom: 1.25rem;
+}
+
+.ecosystem-logo-outer {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  padding: 3px;
+  background: radial-gradient(circle, rgba(20, 184, 166, 0.4) 0%, rgba(6, 182, 212, 0.2) 70%, transparent 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.ecosystem-logo-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  border: 1px solid rgba(20, 184, 166, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+.ecosystem-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.ecosystem-title {
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.35rem;
+}
+
+.ecosystem-title-bot {
+  color: var(--accent-teal);
+}
+
+.ecosystem-title-chain {
+  color: var(--text-main);
+}
+
+.ecosystem-tagline {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-bottom: 1.35rem;
+  font-weight: 500;
+}
+
+.ecosystem-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 280px;
+  margin-bottom: 1.4rem;
+}
+
+.ecosystem-divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.35), transparent);
+}
+
+.ecosystem-divider-diamond {
+  color: var(--accent-teal);
+  font-size: 0.65rem;
+  line-height: 1;
+}
+
+.ecosystem-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.ecosystem-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+}
+
+.ecosystem-link:hover {
+  color: var(--accent-cyan);
+  border-color: rgba(20, 184, 166, 0.5);
+  background: rgba(20, 184, 166, 0.1);
+  transform: translateY(-1px);
+}
+
+.ecosystem-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.ecosystem-meta {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  letter-spacing: 0.02em;
+}
+
+.ecosystem-meta strong {
+  color: var(--text-muted);
+}
+
+/* Footer Sub-bar */
+.footer-sub-bar {
+  max-width: 780px;
+  margin: 1.5rem auto 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.footer-sub-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.footer-mini-logo {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  object-fit: cover;
 }
 
 /* ==========================================

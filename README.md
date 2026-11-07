@@ -8,23 +8,25 @@ All deal details (title, description, delivery notes, and dispute reasons) are s
 
 ---
 
-## Onchain Deployment (BOT Testnet)
+## Onchain Deployment (BOT Chain Mainnet)
 
 | Parameter | Value |
 | :--- | :--- |
-| **Network** | BOT Testnet |
-| **Chain ID** | `968` |
-| **RPC Endpoint** | `https://rpc.bohr.life` |
-| **Block Explorer** | `https://scan.bohr.life` |
-| **Native Token** | BOT (18 Decimals) |
-| **Contract Address** | [`0x012A03aC38bdffa9cBA9d8D4BAc7861aCEf0052b`](https://scan.bohr.life/address/0x012a03ac38bdffa9cba9d8d4bac7861acef0052b) |
-| **Blockscout Verification** | **Verified** (GUID: `012a03ac38bdffa9cba9d8d4bac7861acef0052b6aecf667`) |
+| **Network** | BOT Chain Mainnet |
+| **Chain ID** | `677` |
+| **RPC Endpoint** | `https://rpc.botchain.ai` |
+| **Block Explorer** | [https://scan.botchain.ai](https://scan.botchain.ai) |
+| **Official Website** | [https://www.botchain.ai/en/](https://www.botchain.ai/en/) |
+| **Native Token** | BOT (18 Decimals, 150M Total Supply) |
+| **Contract Address** | [`0x012A03aC38bdffa9cBA9d8D4BAc7861aCEf0052b`](https://scan.botchain.ai/address/0x012a03ac38bdffa9cba9d8d4bac7861acef0052b) |
+| **BOTScan Verification** | **Verified** (`Pass - Verified`, GUID: `012a03ac38bdffa9cba9d8d4bac7861acef0052b6aef27c6`) |
+| **Deployment Transaction** | [`0xbef5b0163b43f62dc903016978f4d701375a2e135250ca480fa2fdaebff6d399`](https://scan.botchain.ai/tx/0xbef5b0163b43f62dc903016978f4d701375a2e135250ca480fa2fdaebff6d399) |
 | **Active Onchain Deals** | **6 Live Deals Created & Tested** |
-| **Onchain Transactions** | **24 Transactions Across 3 Dedicated Test Wallets** |
+| **Onchain Transactions** | **24 Transactions Across 3 Dedicated Wallets (8 per wallet)** |
 
 ### Verified Multi-Wallet Test Activity
 
-24 consecutive transactions were executed across 3 separate wallets, testing every protocol state path:
+24 consecutive transactions were executed across 3 separate wallets on BOT Chain Mainnet, thoroughly testing every protocol state transition:
 
 | Wallet | Address | Tx Count | Key Actions Tested |
 | :--- | :--- | :--- | :--- |
@@ -142,22 +144,22 @@ forge test -vv
 
 ## Deployment Instructions
 
-To deploy to BOT Testnet using an existing Cast keystore account:
+To deploy to BOT Chain Mainnet using an existing Cast keystore account:
 
 ```bash
 cd contracts
 forge script script/Deploy.s.sol \
-  --rpc-url https://rpc.bohr.life \
+  --rpc-url https://rpc.botchain.ai \
   --account holdr \
-  --password-file <path-to-ignored-password-file> \
+  --password <password> \
   --broadcast
 ```
 
-To verify on the BohrScan explorer:
+To verify on the BOTScan explorer:
 
 ```bash
 forge verify-contract <DEPLOYED_ADDRESS> src/Holdr.sol:Holdr \
-  --verifier-url https://scan.bohr.life/api \
+  --verifier-url https://scan.botchain.ai/api \
   --verifier blockscout
 ```
 
@@ -173,7 +175,7 @@ npm run dev
 Open `http://localhost:5173/` in your browser.
 
 - Connect MetaMask or any injected Web3 wallet.
-- Click **"Switch to BOT Testnet"** if connected to another network.
+- Click **"Switch to BOT Chain Mainnet"** if connected to another network.
 - Create escrow deals, inspect live countdown timers, share deal links (`#/deal/:id`), and withdraw pending balances.
 
 ---

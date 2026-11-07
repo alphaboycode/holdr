@@ -8,7 +8,7 @@ import {
 import {
   contractAddress,
   holdrAbi,
-  botTestnet,
+  botMainnet,
   publicClient,
 } from './contracts';
 import { Deal, DealStatus, DashboardTab, TxStatus } from './types';
@@ -45,7 +45,7 @@ export const App: React.FC = () => {
   const [txStatus, setTxStatus] = useState<TxStatus>({ state: 'idle' });
   const [actionPending, setActionPending] = useState(false);
 
-  const isCorrectChain = chainId === botTestnet.id;
+  const isCorrectChain = chainId === botMainnet.id;
 
   // Handle URL hash changes (#/deal/5)
   useEffect(() => {
@@ -74,16 +74,16 @@ export const App: React.FC = () => {
     window.location.hash = '#/';
   };
 
-  // Add / Switch network action to BOT Testnet (968)
-  const switchToBotTestnet = async () => {
+  // Add / Switch network action to BOT Chain Mainnet (677)
+  const switchToBotMainnet = async () => {
     if (typeof window === 'undefined' || !window.ethereum) return;
 
     try {
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: '0x3c8' }], // 968 in hex
+        params: [{ chainId: '0x2a5' }], // 677 in hex
       });
-      setChainId(968);
+      setChainId(677);
     } catch (switchError: any) {
       if (switchError.code === 4902 || switchError?.data?.originalError?.code === 4902) {
         try {
@@ -91,21 +91,21 @@ export const App: React.FC = () => {
             method: 'wallet_addEthereumChain',
             params: [
               {
-                chainId: '0x3c8',
-                chainName: 'BOT Testnet',
+                chainId: '0x2a5',
+                chainName: 'BOT Chain Mainnet',
                 nativeCurrency: {
                   name: 'BOT',
                   symbol: 'BOT',
                   decimals: 18,
                 },
-                rpcUrls: ['https://rpc.bohr.life'],
-                blockExplorerUrls: ['https://scan.bohr.life'],
+                rpcUrls: ['https://rpc.botchain.ai'],
+                blockExplorerUrls: ['https://scan.botchain.ai'],
               },
             ],
           });
-          setChainId(968);
+          setChainId(677);
         } catch (addError) {
-          console.error('Failed to add BOT Testnet:', addError);
+          console.error('Failed to add BOT Chain Mainnet:', addError);
         }
       } else {
         console.error('Failed to switch network:', switchError);
@@ -134,13 +134,13 @@ export const App: React.FC = () => {
     const currentChain = parseInt(currentChainHex, 16);
     setChainId(currentChain);
 
-    if (currentChain !== botTestnet.id) {
-      await switchToBotTestnet();
+    if (currentChain !== botMainnet.id) {
+      await switchToBotMainnet();
     }
 
     const client = createWalletClient({
       account: activeAccount,
-      chain: botTestnet,
+      chain: botMainnet,
       transport: custom(window.ethereum),
     });
 
@@ -574,9 +574,9 @@ export const App: React.FC = () => {
       {/* Wrong Network Warning Banner */}
       {account && !isCorrectChain && (
         <div className="network-alert-banner">
-          <span>⚠️ Connected to wrong network. Holdr operates on BOT Testnet (Chain ID 968).</span>
-          <button className="btn btn-sm btn-warning" onClick={switchToBotTestnet}>
-            Switch to BOT Testnet
+          <span>⚠️ Connected to wrong network. Holdr operates on BOT Chain Mainnet (Chain ID 677).</span>
+          <button className="btn btn-sm btn-warning" onClick={switchToBotMainnet}>
+            Switch to BOT Chain Mainnet
           </button>
         </div>
       )}
@@ -585,7 +585,7 @@ export const App: React.FC = () => {
       <TxBanner
         status={txStatus}
         onDismiss={() => setTxStatus({ state: 'idle' })}
-        explorerUrl="https://scan.bohr.life"
+        explorerUrl="https://scan.botchain.ai"
       />
 
       {/* Main Content Area */}
@@ -712,9 +712,9 @@ export const App: React.FC = () => {
                               : activeTab === 'seller'
                               ? 'the seller'
                               : 'the arbiter'
-                          }, or browse all public deals on BOT Testnet.`
+                          }, or browse all public deals on BOT Chain Mainnet.`
                         : activeTab === 'all'
-                        ? 'No escrow deals have been created on BOT Testnet yet.'
+                        ? 'No escrow deals have been created on BOT Chain Mainnet yet.'
                         : activeTab === 'buyer'
                         ? "You haven't created any deals as buyer yet."
                         : activeTab === 'seller'
@@ -770,9 +770,135 @@ export const App: React.FC = () => {
 
       {/* Footer */}
       <footer className="app-footer">
-        <div className="footer-content">
-          <span>Holdr Escrow Contract: <a href={`https://scan.bohr.life/address/${contractAddress}`} target="_blank" rel="noreferrer" className="font-mono footer-link">{contractAddress}</a></span>
-          <span>BOT Testnet (Chain ID 968) • 0% Platform Fees • Trustless Escrow</span>
+        <div className="footer-container">
+          {/* Section 1: Proof on bot mainnet */}
+          <div className="footer-proof-section">
+            <div className="proof-header">
+              <span className="proof-badge-dot">●</span>
+              <span className="proof-title">Proof on bot mainnet</span>
+            </div>
+            <div className="proof-grid">
+              <div className="proof-item">
+                <span className="proof-label">Chain id:</span>
+                <span className="proof-value">677</span>
+              </div>
+              <div className="proof-item">
+                <span className="proof-label">Contract:</span>
+                <a
+                  href={`https://scan.botchain.ai/address/${contractAddress}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="proof-link mono"
+                >
+                  {contractAddress}
+                </a>
+              </div>
+              <div className="proof-item">
+                <span className="proof-label">BOT Chain Website:</span>
+                <a
+                  href="https://www.botchain.ai/en/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="proof-link"
+                >
+                  https://www.botchain.ai/en/
+                </a>
+              </div>
+              <div className="proof-item">
+                <span className="proof-label">BOTScan explorer:</span>
+                <a
+                  href="https://scan.botchain.ai/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="proof-link"
+                >
+                  https://scan.botchain.ai/
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 2: Part of the Ecosystem */}
+          <div className="ecosystem-section">
+            <div className="ecosystem-card">
+              <div className="ecosystem-badge">PART OF THE ECOSYSTEM</div>
+
+              <div className="ecosystem-logo-outer">
+                <div className="ecosystem-logo-inner">
+                  <img src="/bot-logo.svg" alt="BOT Chain Logo" className="ecosystem-logo-img" />
+                </div>
+              </div>
+
+              <div className="ecosystem-title">
+                <span className="ecosystem-title-bot">BOT</span>{' '}
+                <span className="ecosystem-title-chain">Chain</span>
+              </div>
+
+              <p className="ecosystem-tagline">Escrowed, delivered, on chain</p>
+
+              <div className="ecosystem-divider">
+                <span className="ecosystem-divider-line" />
+                <span className="ecosystem-divider-diamond">◆</span>
+                <span className="ecosystem-divider-line" />
+              </div>
+
+              <div className="ecosystem-links">
+                <a
+                  href="https://www.botchain.ai/en/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ecosystem-link"
+                >
+                  <svg
+                    className="ecosystem-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                  </svg>
+                  <span>botchain.ai</span>
+                </a>
+
+                <a
+                  href="https://scan.botchain.ai/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ecosystem-link"
+                >
+                  <svg
+                    className="ecosystem-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                  <span>Explorer</span>
+                </a>
+              </div>
+
+              <div className="ecosystem-meta">
+                &copy; 2026 <strong>BOT Chain</strong> &middot; Mainnet &middot; Chain ID <strong>677</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="footer-sub-bar">
+          <div className="footer-sub-brand">
+            <img src={holdrLogo} alt="Holdr Logo" className="footer-mini-logo" />
+            <span>Holdr Escrow &bull; Deployed on BOT Chain Mainnet (Chain ID 677) &bull; 0% Platform Fees</span>
+          </div>
         </div>
       </footer>
     </div>

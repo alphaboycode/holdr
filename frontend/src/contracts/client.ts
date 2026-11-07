@@ -1,7 +1,7 @@
 import { createPublicClient, http } from 'viem';
-import { botTestnet } from './chain';
+import { botMainnet } from './chain';
 
 export const publicClient = createPublicClient({
-  chain: botTestnet,
-  transport: http('https://rpc.bohr.life'),
+  chain: botMainnet,
+  transport: http('https://rpc.botchain.ai'),
 });

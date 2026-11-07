@@ -7,7 +7,7 @@ interface TxBannerProps {
   explorerUrl?: string;
 }
 
-export const TxBanner: React.FC<TxBannerProps> = ({ status, onDismiss, explorerUrl = 'https://scan.bohr.life' }) => {
+export const TxBanner: React.FC<TxBannerProps> = ({ status, onDismiss, explorerUrl = 'https://scan.botchain.ai' }) => {
   if (status.state === 'idle') return null;
 
   return (
